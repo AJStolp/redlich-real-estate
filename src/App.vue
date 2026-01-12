@@ -154,7 +154,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { supabase } from './lib/supabase'
+import { supabase, isSupabaseConfigured } from './lib/supabase'
 
 const formData = ref({
   name: '',
@@ -170,8 +170,13 @@ const agentId = ref(null)
 
 const currentYear = computed(() => new Date().getFullYear())
 
-// Get Brian's agent ID on component mount
+// Get Brian's agent ID on component mount (only if Supabase is configured)
 onMounted(async () => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase not configured. Form submissions will not be saved.')
+    return
+  }
+
   try {
     const { data, error } = await supabase
       .from('agents')
@@ -191,24 +196,30 @@ const handleSubmit = async () => {
   submitMessage.value = ''
 
   try {
-    if (!agentId.value) {
-      throw new Error('Agent configuration not found')
+    // If Supabase is configured, save to database
+    if (isSupabaseConfigured) {
+      if (!agentId.value) {
+        throw new Error('Agent configuration not found')
+      }
+
+      const { error } = await supabase
+        .from('form_submissions')
+        .insert([
+          {
+            agent_id: agentId.value,
+            name: formData.value.name,
+            email: formData.value.email,
+            phone: formData.value.phone || null,
+            message: formData.value.message
+          }
+        ])
+
+      if (error) throw error
+    } else {
+      // Fallback: Just log to console if Supabase isn't configured
+      console.log('Form submission (Supabase not configured):', formData.value)
+      await new Promise(resolve => setTimeout(resolve, 1000))
     }
-
-    // Submit form data to Supabase
-    const { error } = await supabase
-      .from('form_submissions')
-      .insert([
-        {
-          agent_id: agentId.value,
-          name: formData.value.name,
-          email: formData.value.email,
-          phone: formData.value.phone || null,
-          message: formData.value.message
-        }
-      ])
-
-    if (error) throw error
 
     submitMessage.value = 'Thank you for reaching out! I\'ll get back to you soon.'
     submitStatus.value = 'success'
