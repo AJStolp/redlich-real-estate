@@ -12,7 +12,7 @@
         <div class="flex-shrink-0">
           <img
             src="/br-profile.jpg"
-            alt="Brian Redlich"
+            :alt="content.hero.name"
             class="w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-white/20 shadow-2xl"
           >
         </div>
@@ -20,26 +20,26 @@
         <!-- Hero Text -->
         <div class="text-center md:text-left">
           <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
-            Brian Redlich
+            {{ content.hero.name }}
           </h1>
           <p class="text-xl md:text-2xl mb-6 text-emerald-400 font-medium">
-            Real Estate Agent | Real Brokerage
+            {{ content.hero.subtitle }}
           </p>
           <p class="text-lg md:text-xl mb-8 opacity-90 leading-relaxed max-w-2xl">
-            With over 20 years of real estate experience, I've built a successful business by sticking to old school principles: hard work, knowledge, and communication.
+            {{ content.hero.bio }}
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <a
               href="#contact"
               class="inline-block px-8 py-4 bg-emerald-500 text-white font-semibold text-lg rounded-lg hover:bg-emerald-600 hover:-translate-y-1 transition-all duration-300 shadow-xl"
             >
-              Get In Touch
+              {{ content.hero.ctaText }}
             </a>
             <a
               href="#family"
               class="inline-block px-8 py-4 bg-white/10 text-white font-semibold text-lg rounded-lg hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 border border-white/20"
             >
-              Meet the Family
+              {{ content.hero.secondaryCtaText }}
             </a>
           </div>
         </div>
@@ -50,41 +50,64 @@
     <section class="py-20 bg-white px-6">
       <div class="max-w-6xl mx-auto">
         <h2 class="text-4xl md:text-5xl font-bold text-center mb-6 text-gray-800">
-          About Brian
+          {{ content.about.heading }}
         </h2>
         <p class="text-center text-lg text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-          As a leading agent in the Milwaukee market, I've achieved top agent recognition and built a group of over 100 agents. I'm now recognized as an industry leader and mentor for real estate professionals.
+          {{ content.about.description }}
         </p>
 
         <!-- Stats Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-          <div class="bg-slate-50 p-8 rounded-xl text-center border border-slate-200">
-            <div class="text-4xl md:text-5xl font-bold text-emerald-600 mb-2">20+</div>
-            <p class="text-gray-600 font-medium">Years Experience</p>
-          </div>
-          <div class="bg-slate-50 p-8 rounded-xl text-center border border-slate-200">
-            <div class="text-4xl md:text-5xl font-bold text-emerald-600 mb-2">1,000+</div>
-            <p class="text-gray-600 font-medium">Transactions Closed</p>
-          </div>
-          <div class="bg-slate-50 p-8 rounded-xl text-center border border-slate-200">
-            <div class="text-4xl md:text-5xl font-bold text-emerald-600 mb-2">$200M</div>
-            <p class="text-gray-600 font-medium">In Sales</p>
-          </div>
-          <div class="bg-slate-50 p-8 rounded-xl text-center border border-slate-200">
-            <div class="text-4xl md:text-5xl font-bold text-emerald-600 mb-2">100+</div>
-            <p class="text-gray-600 font-medium">Agents Mentored</p>
+          <div v-for="stat in content.stats" :key="stat.label" class="bg-slate-50 p-8 rounded-xl text-center border border-slate-200">
+            <div class="text-4xl md:text-5xl font-bold text-emerald-600 mb-2">{{ stat.value }}</div>
+            <p class="text-gray-600 font-medium">{{ stat.label }}</p>
           </div>
         </div>
 
         <!-- Bio Text -->
         <div class="max-w-4xl mx-auto bg-gradient-to-br from-slate-800 to-slate-700 text-white p-10 md:p-12 rounded-2xl shadow-xl">
           <p class="text-lg leading-relaxed mb-6">
-            Taking care of my clients is my number one goal. Brian and his team have closed over 1,000 transactions and nearly $200 million dollars in real estate sold in the last ten years.
+            {{ content.about.bioParagraph1 }}
           </p>
           <p class="text-lg leading-relaxed">
-            I'm honored to help real estate professionals scale their business to become better agents and leaders. <span class="text-emerald-400 font-medium">Buyers and Sellers, just know I am a phone call away to help you reach your real estate goals!</span>
+            {{ content.about.bioParagraph2 }} <span class="text-emerald-400 font-medium">{{ content.about.bioHighlight }}</span>
           </p>
         </div>
+      </div>
+    </section>
+
+    <!-- Brokerage Slides Carousel -->
+    <section v-if="content.brokerageSlides.length" class="py-20 bg-gradient-to-br from-slate-800 to-slate-700 px-6">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 text-white">
+          The Brokerage
+        </h2>
+        <p class="text-center text-lg text-slate-300 mb-12 max-w-2xl mx-auto">
+          See what makes Real Brokerage stand out.
+        </p>
+
+        <Swiper
+          :modules="[Navigation, Pagination]"
+          :navigation="true"
+          :pagination="{ clickable: true }"
+          :loop="content.brokerageSlides.length > 1"
+          :space-between="0"
+          :slides-per-view="1"
+          class="brokerage-carousel rounded-2xl overflow-hidden shadow-2xl"
+        >
+          <SwiperSlide v-for="(slide, i) in content.brokerageSlides" :key="i">
+            <div class="relative">
+              <img
+                :src="urlFor(slide.image)?.width(1200).auto('format').url()"
+                :alt="slide.title || `Slide ${i + 1}`"
+                class="w-full h-auto object-contain bg-white"
+              >
+              <div v-if="slide.title" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                <p class="text-white text-lg font-medium">{{ slide.title }}</p>
+              </div>
+            </div>
+          </SwiperSlide>
+        </Swiper>
       </div>
     </section>
 
@@ -101,63 +124,20 @@
         <!-- Featured Teams -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <a
-            href="https://www.thepowerhousepartners.com"
+            v-for="team in content.featuredTeams"
+            :key="team.name"
+            :href="team.url"
             target="_blank"
             rel="noopener noreferrer"
             class="group bg-white p-8 rounded-xl border-2 border-slate-200 hover:border-emerald-500 hover:shadow-xl transition-all duration-300"
           >
             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-xl font-bold text-gray-800 group-hover:text-emerald-600 transition-colors">Powerhouse Partners</h3>
+              <h3 class="text-xl font-bold text-gray-800 group-hover:text-emerald-600 transition-colors">{{ team.name }}</h3>
               <svg class="w-5 h-5 text-gray-400 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
               </svg>
             </div>
-            <p class="text-gray-600">Led by Alexis Hirsig & Alex Derenne</p>
-          </a>
-
-          <a
-            href="https://www.fernwoodrealestate.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group bg-white p-8 rounded-xl border-2 border-slate-200 hover:border-emerald-500 hover:shadow-xl transition-all duration-300"
-          >
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-xl font-bold text-gray-800 group-hover:text-emerald-600 transition-colors">Fernwood Real Estate</h3>
-              <svg class="w-5 h-5 text-gray-400 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-            </div>
-            <p class="text-gray-600">Led by Lindsey Vebber</p>
-          </a>
-
-          <a
-            href="https://www.facebook.com/barbandkent/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group bg-white p-8 rounded-xl border-2 border-slate-200 hover:border-emerald-500 hover:shadow-xl transition-all duration-300"
-          >
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-xl font-bold text-gray-800 group-hover:text-emerald-600 transition-colors">Breitenfeldt Team</h3>
-              <svg class="w-5 h-5 text-gray-400 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-            </div>
-            <p class="text-gray-600">Led by Barb & Kent Breitenfeldt</p>
-          </a>
-
-          <a
-            href="https://www.everly.properties/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group bg-white p-8 rounded-xl border-2 border-slate-200 hover:border-emerald-500 hover:shadow-xl transition-all duration-300"
-          >
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-xl font-bold text-gray-800 group-hover:text-emerald-600 transition-colors">Everly Properties</h3>
-              <svg class="w-5 h-5 text-gray-400 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-            </div>
-            <p class="text-gray-600">Property Management led by James Marquardt</p>
+            <p class="text-gray-600">{{ team.description }}</p>
           </a>
         </div>
 
@@ -165,7 +145,7 @@
         <div class="bg-white p-8 md:p-10 rounded-xl border border-slate-200">
           <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Family Members</h3>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            <div v-for="member in familyMembers" :key="member" class="text-center py-3 px-2 rounded-lg bg-slate-50 text-gray-700 font-medium text-sm">
+            <div v-for="member in content.familyMembers" :key="member" class="text-center py-3 px-2 rounded-lg bg-slate-50 text-gray-700 font-medium text-sm">
               {{ member }}
             </div>
           </div>
@@ -177,10 +157,10 @@
     <section id="contact" class="py-24 bg-gradient-to-b from-slate-50 to-gray-100 px-6">
       <div class="max-w-6xl mx-auto">
         <h2 class="text-4xl md:text-5xl font-bold text-center mb-6 text-gray-800">
-          Let's Connect
+          {{ content.contact.heading }}
         </h2>
         <p class="text-center text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-          Ready to take the next step? Send me a message and I'll get back to you shortly.
+          {{ content.contact.description }}
         </p>
 
         <form @submit.prevent="handleSubmit" class="max-w-2xl mx-auto bg-white p-12 rounded-2xl shadow-lg">
@@ -261,15 +241,25 @@
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8 px-6 text-center mt-auto">
       <div class="max-w-6xl mx-auto">
-        <p class="opacity-90">&copy; {{ currentYear }} Brian Redlich. All rights reserved.</p>
+        <p class="opacity-90">&copy; {{ currentYear }} {{ content.footer.copyrightName }}. All rights reserved.</p>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { supabase, isSupabaseConfigured } from './lib/supabase'
+import { ref, computed } from 'vue'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Navigation, Pagination } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+import { useSanityContent } from './composables/useSanityContent'
+import { urlFor } from './lib/sanity'
+
+const { content } = useSanityContent()
+
+const WEB3FORMS_KEY = 'a7ac5dac-8e3f-4f9e-b93b-b5188ba5ed14'
 
 const formData = ref({
   name: '',
@@ -281,96 +271,34 @@ const formData = ref({
 const isSubmitting = ref(false)
 const submitMessage = ref('')
 const submitStatus = ref('')
-const agentId = ref(null)
 
 const currentYear = computed(() => new Date().getFullYear())
-
-// Real Estate Family members (alphabetical order)
-const familyMembers = [
-  'Aisha Rent',
-  'Allana Gonzalez',
-  'Anthony Stolp',
-  'Austin Cole',
-  'Barbara Miller',
-  'Bijay Shah',
-  'Brianna Pavloski',
-  'Caleb Atkinson',
-  'Carrie Kutz',
-  'Chad Hofmann',
-  'Elana Kootstra',
-  'Janean Peeler',
-  'Jennifer Revord',
-  'Joseph Borkhus',
-  'Kim Acompanado Bohmann',
-  'Mallori Wieland',
-  'Marissa Harrington',
-  'Megan Wing',
-  'Meghan Dinmore',
-  'Mindy Riesen',
-  'Natalia Renteria',
-  'Peter Suhm',
-  'Russell Tillmann',
-  'Sarah Clements',
-  'Shalonda McCrory',
-  'Stevi Chadwick',
-  'Tammy Shaw-Stelter'
-]
-
-// Get Brian's agent ID on component mount (only if Supabase is configured)
-onMounted(async () => {
-  if (!isSupabaseConfigured) {
-    console.warn('Supabase not configured. Form submissions will not be saved.')
-    return
-  }
-
-  try {
-    const { data, error } = await supabase
-      .from('agents')
-      .select('id')
-      .eq('name', 'Brian Redlich')
-      .single()
-
-    if (error) throw error
-    agentId.value = data.id
-  } catch (error) {
-    console.error('Error fetching agent:', error)
-  }
-})
 
 const handleSubmit = async () => {
   isSubmitting.value = true
   submitMessage.value = ''
 
   try {
-    // If Supabase is configured, save to database
-    if (isSupabaseConfigured) {
-      if (!agentId.value) {
-        throw new Error('Agent configuration not found')
-      }
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        access_key: WEB3FORMS_KEY,
+        subject: `New inquiry from ${formData.value.name}`,
+        from_name: formData.value.name,
+        name: formData.value.name,
+        email: formData.value.email,
+        phone: formData.value.phone || 'Not provided',
+        message: formData.value.message
+      })
+    })
 
-      const { error } = await supabase
-        .from('form_submissions')
-        .insert([
-          {
-            agent_id: agentId.value,
-            name: formData.value.name,
-            email: formData.value.email,
-            phone: formData.value.phone || null,
-            message: formData.value.message
-          }
-        ])
+    const result = await response.json()
+    if (!result.success) throw new Error(result.message)
 
-      if (error) throw error
-    } else {
-      // Fallback: Just log to console if Supabase isn't configured
-      console.log('Form submission (Supabase not configured):', formData.value)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-    }
-
-    submitMessage.value = 'Thank you for reaching out! I\'ll get back to you soon.'
+    submitMessage.value = content.value.contact.successMessage
     submitStatus.value = 'success'
 
-    // Reset form
     formData.value = {
       name: '',
       email: '',
@@ -379,7 +307,7 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     console.error('Form submission error:', error)
-    submitMessage.value = 'Sorry, something went wrong. Please try again or email me directly.'
+    submitMessage.value = content.value.contact.errorMessage
     submitStatus.value = 'error'
   } finally {
     isSubmitting.value = false

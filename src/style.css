@@ -30,6 +30,32 @@
   }
 }
 
+/* Brokerage carousel overrides */
+.brokerage-carousel .swiper-button-next,
+.brokerage-carousel .swiper-button-prev {
+  color: #10b981;
+  background: rgba(0, 0, 0, 0.4);
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  backdrop-filter: blur(4px);
+}
+
+.brokerage-carousel .swiper-button-next::after,
+.brokerage-carousel .swiper-button-prev::after {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.brokerage-carousel .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+}
+
+.brokerage-carousel .swiper-pagination-bullet-active {
+  background: #10b981;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
